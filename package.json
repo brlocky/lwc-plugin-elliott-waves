@@ -17,5 +17,9 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:brlocky/lwc-plugin-elliott-waves.git"
   }
 }
