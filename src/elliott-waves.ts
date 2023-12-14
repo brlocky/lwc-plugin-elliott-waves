@@ -68,7 +68,7 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this._setCrosshairMode();
 
     this._mouseHandlers.attached(this.chart, this.series);
-    this._mouseHandlers.clicked().subscribe((mouseUpdate: MousePosition | null) => {
+    this._mouseHandlers.clicked().subscribe((_: MousePosition | null) => {
       if (this._isSelectingPivot && this._selectedPivot) {
         this._pivotChanged.fire(this._selectedPivot);
         this.requestUpdate();
