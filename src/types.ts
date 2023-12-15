@@ -1,17 +1,17 @@
 import { Time } from 'lightweight-charts';
 
-export enum Trend {
+export const enum Trend {
   UP = 1,
   NONE = 0,
   DOWN = -1,
 }
 
-export enum PivotType {
+export const enum PivotType {
   HIGH = 1,
   LOW = -1,
 }
 
-export enum Wave {
+export const enum Wave {
   _1 = 1,
   _2 = 2,
   _3 = 3,
@@ -24,7 +24,7 @@ export enum Wave {
   _E = 10,
 }
 
-export enum Degree {
+export const enum Degree {
   MINISCULE = 1,
   SUBMICRO = 2,
   MICRO = 3,
