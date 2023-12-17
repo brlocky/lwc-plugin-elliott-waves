@@ -1,7 +1,7 @@
-import { BarData, Coordinate, ISeriesPrimitivePaneView, Time } from 'lightweight-charts';
+import { BarData, Coordinate, Time } from 'lightweight-charts';
 import { ElliottWavesPaneRenderer } from './pane-renderer';
 import { ElliottWavesDataSource } from './data-source';
-import { PivotChangeInfo, PivotType } from './types';
+import { ISeriesPrimitivePaneViewWithHover, PivotChangeInfo, PivotType } from './types';
 import { Delegate } from './helpers/delegate';
 
 export interface ViewPoint {
@@ -10,7 +10,7 @@ export interface ViewPoint {
   type: PivotType;
 }
 
-export class ElliottWavesPaneView implements ISeriesPrimitivePaneView {
+export class ElliottWavesPaneView implements ISeriesPrimitivePaneViewWithHover {
   _source: ElliottWavesDataSource;
   _pivot: ViewPoint | null;
   _pivotChanged: Delegate<PivotChangeInfo> = new Delegate();
@@ -18,6 +18,9 @@ export class ElliottWavesPaneView implements ISeriesPrimitivePaneView {
   constructor(source: ElliottWavesDataSource) {
     this._source = source;
     this._pivot = null;
+  }
+  isHover(_: number, __: number): boolean {
+    return false;
   }
 
   pivotChanged(): Delegate<PivotChangeInfo> {

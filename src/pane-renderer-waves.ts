@@ -15,7 +15,31 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     target.useBitmapCoordinateSpace((scope) => {
       // this._drawTradingLineLabels(scope);
       this._drawPivots(scope);
+
+      /* // Check if the crosshair is over any pivot
+      this._pivots.forEach((pivot) => {
+        if (this._isHovered(pivot, crosshairX, crosshairY)) {
+          // Do something when the crosshair is over the pivot
+          console.log('Crosshair is over a pivot:', pivot);
+        }
+      }); */
     });
+  }
+
+  _isHovered(pivot: UIPivot, crosshairX: number, crosshairY: number): boolean {
+    // Check if the crosshair is over the pivot
+    // Implement the logic based on your requirements
+    const vPadding = pivot.type === PivotType.HIGH ? -20 : 20;
+    const labelWidth = this._calculateLabelWidth((pivot.wave?.toString() || '').length);
+    const labelXDimensions = positionsLine(pivot.x as number, 1, labelWidth);
+    const yDimensions = positionsLine(pivot.y + vPadding, 1, centreLabelHeight);
+
+    return (
+      crosshairX >= labelXDimensions.position &&
+      crosshairX <= labelXDimensions.position + labelXDimensions.length &&
+      crosshairY >= yDimensions.position &&
+      crosshairY <= yDimensions.position + yDimensions.length
+    );
   }
 
   _calculateLabelWidth(textLength: number) {
@@ -34,10 +58,9 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     const ctx = scope.context;
     let text = pivot.wave?.toString() || ('- ' as string);
 
-    const vPadding = pivot.type === PivotType.HIGH ? -20 : 20;
     const labelWidth = this._calculateLabelWidth(text.length);
     const labelXDimensions = positionsLine(pivot.x as number, scope.horizontalPixelRatio, labelWidth);
-    const yDimensions = positionsLine(pivot.y + vPadding, scope.verticalPixelRatio, centreLabelHeight);
+    const yDimensions = positionsLine(pivot.y, scope.verticalPixelRatio, centreLabelHeight);
 
     const radius = 4 * scope.horizontalPixelRatio;
     // draw main body background of label
@@ -45,6 +68,15 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     ctx.roundRect(labelXDimensions.position, yDimensions.position, labelXDimensions.length, yDimensions.length, radius);
     ctx.fillStyle = '#FFFFFF';
     ctx.fill();
+
+    if (pivot.isHover) {
+      // draw hover background for remove button
+      ctx.beginPath();
+      ctx.roundRect(labelXDimensions.position, yDimensions.position, labelXDimensions.length, yDimensions.length, [0, radius, radius, 0]);
+      //ctx.fillStyle = '#F0F3FA';
+      ctx.fillStyle = '#FF0000';
+      ctx.fill();
+    }
 
     // draw stroke for main body
     ctx.beginPath();
@@ -63,7 +95,7 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     ctx.fillText(
       text,
       labelXDimensions.position + centreLabelInlinePadding * scope.horizontalPixelRatio,
-      vPadding * scope.verticalPixelRatio + pivot.y * scope.verticalPixelRatio,
+      pivot.y * scope.verticalPixelRatio,
     );
   }
 }

@@ -1,29 +1,33 @@
-import { Logical, Time, DataChangedScope, SeriesAttachedParameter, CrosshairMode, Coordinate } from 'lightweight-charts';
-import { Point, ElliottWavesDataSource } from './data-source';
+import {
+  Logical,
+  Time,
+  DataChangedScope,
+  SeriesAttachedParameter,
+  CrosshairMode,
+  Coordinate,
+  PrimitiveHoveredItem,
+} from 'lightweight-charts';
+import { ElliottWavesDataSource } from './data-source';
 import { ElliottWavesOptions, defaultOptions } from './options';
 import { ElliottWavesPaneView } from './pane-view';
 import { PluginBase } from './plugin-base';
 import { MouseHandlers, MousePosition } from './mouse';
 import { Delegate } from './helpers/delegate';
-import { PivotChangeInfo, WaveNode } from './types';
+import { ISeriesPrimitivePaneViewWithHover, PivotChangeInfo, WavePivot } from './types';
 import { WavesPaneView } from './pane-view-waves';
 
 export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   _options: ElliottWavesOptions;
-  _p1: Point;
-  _p2: Point;
-  _paneViews: (ElliottWavesPaneView | WavesPaneView)[];
+  _paneViews: ISeriesPrimitivePaneViewWithHover[];
   _mouseHandlers: MouseHandlers;
   _mousePosition: MousePosition;
   _isSelectingPivot: boolean;
-  _waves: WaveNode[];
+  _pivots: WavePivot[];
   _selectedPivot: PivotChangeInfo | null;
   _pivotChanged: Delegate<PivotChangeInfo> = new Delegate();
 
-  constructor(p1: Point, p2: Point, options: Partial<ElliottWavesOptions> = {}) {
+  constructor(options: Partial<ElliottWavesOptions> = {}) {
     super();
-    this._p1 = p1;
-    this._p2 = p2;
     this._options = {
       ...defaultOptions,
       ...options,
@@ -46,11 +50,36 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
       overTimeScale: false,
     };
     this._isSelectingPivot = false;
-    this._waves = [];
+    this._pivots = [];
   }
 
   pivotChanged(): Delegate<PivotChangeInfo> {
     return this._pivotChanged;
+  }
+
+  /**
+   * Hit test method which will be called by the library when the cursor is moved.
+   * Use this to register object ids being hovered for use within the crosshairMoved
+   * and click events emitted by the chart. Additionally, the hit test result can
+   * specify a preferred cursor type to display for the main chart pane. This method
+   * should return the top most hit for this primitive if more than one object is
+   * being intersected.
+   *
+   * @param x - x Coordinate of mouse event
+   * @param y - y Coordinate of mouse event
+   */
+  hitTest(x: number, y: number): PrimitiveHoveredItem | null {
+    const elliottPane = this._paneViews[1];
+    if (elliottPane.isHover(x, y)) {
+      return {
+        externalId: 'elliott-waves',
+        cursorStyle: 'pointer',
+        zOrder: 'top', // "bottom" | "normal" | "top
+        isBackground: false,
+      };
+    }
+
+    return null;
   }
 
   updateIsSelectingPivot(isSelectingPivot: boolean): void {
@@ -58,8 +87,8 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this.requestUpdate();
   }
 
-  updateWaves(waves: WaveNode[]): void {
-    this._waves = waves;
+  updatePivots(pivots: WavePivot[]): void {
+    this._pivots = pivots;
     this.requestUpdate();
   }
 
@@ -86,7 +115,6 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this._mouseHandlers.clicked().unsubscribeAll(this);
     this._mouseHandlers.mouseMoved().unsubscribeAll(this);
     this._mouseHandlers.detached();
-
     super.detached();
   }
 
@@ -125,14 +153,6 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this.requestUpdate();
   }
 
-  public get p1(): Point {
-    return this._p1;
-  }
-
-  public get p2(): Point {
-    return this._p2;
-  }
-
   public get mousePosition(): MousePosition {
     return this._mousePosition;
   }
@@ -141,8 +161,8 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     return this._isSelectingPivot;
   }
 
-  public get waves(): WaveNode[] {
-    return this._waves;
+  public get pivots(): WavePivot[] {
+    return this._pivots;
   }
 
   // We need to disable magnet mode for this to work nicely

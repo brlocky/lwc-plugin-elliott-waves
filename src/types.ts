@@ -1,4 +1,4 @@
-import { Time } from 'lightweight-charts';
+import { ISeriesPrimitivePaneView, Time } from 'lightweight-charts';
 
 export const enum Trend {
   UP = 1,
@@ -50,13 +50,13 @@ export type Pivot = {
 export type WavePivot = Pivot & {
   wave: Wave;
   degree: Degree;
-  volume: number;
   type: PivotType;
 };
 
 export type UIPivot = WavePivot & {
   x: number;
   y: number;
+  isHover: boolean;
 };
 
 export interface PivotChangeInfo {
@@ -73,8 +73,7 @@ export interface WaveNode {
   children: WaveNode[];
 }
 
-export interface WaveCluster {
-  degree: Degree;
-  wave: Wave;
-  nodes: WaveNode[];
+export interface ISeriesPrimitivePaneViewWithHover extends ISeriesPrimitivePaneView {
+  [x: string]: any;
+  isHover(x: number, y: number): boolean;
 }
