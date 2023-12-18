@@ -14,7 +14,7 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
   draw(target: CanvasRenderingTarget2D) {
     target.useBitmapCoordinateSpace((scope) => {
       // this._drawTradingLineLabels(scope);
-      this._drawPivots(scope);
+      this._drawPivots(scope, this._pivots);
 
       /* // Check if the crosshair is over any pivot
       this._pivots.forEach((pivot) => {
@@ -46,11 +46,16 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     return centreLabelInlinePadding * 2 + 2 * textLength * averageWidthPerCharacter;
   }
 
-  _drawPivots(scope: BitmapCoordinatesRenderingScope) {
-    if (!this._pivots.length) return;
+  _drawPivots(scope: BitmapCoordinatesRenderingScope, pivots: UIPivot[]) {
+    if (!pivots.length) return;
 
-    this._pivots.forEach((p) => {
+    pivots.forEach((p) => {
       this._drawPivot(scope, p);
+
+      if (p.children && p.children.length > 0) {
+        // Recursively draw children
+        this._drawPivots(scope, p.children);
+      }
     });
   }
 

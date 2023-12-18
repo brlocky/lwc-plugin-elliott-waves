@@ -13,7 +13,7 @@ import { ElliottWavesPaneView } from './pane-view';
 import { PluginBase } from './plugin-base';
 import { MouseHandlers, MousePosition } from './mouse';
 import { Delegate } from './helpers/delegate';
-import { ISeriesPrimitivePaneViewWithHover, PivotChangeInfo, WavePivot } from './types';
+import { ISeriesPrimitivePaneViewWithHover, PivotChangeInfo, SubCountInfo, WavePivot } from './types';
 import { WavesPaneView } from './pane-view-waves';
 
 export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
@@ -25,6 +25,8 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   _pivots: WavePivot[];
   _selectedPivot: PivotChangeInfo | null;
   _pivotChanged: Delegate<PivotChangeInfo> = new Delegate();
+  _pivotSubCountClicked: Delegate<SubCountInfo> = new Delegate();
+  _hoverPivot: WavePivot | null;
 
   constructor(options: Partial<ElliottWavesOptions> = {}) {
     super();
@@ -51,10 +53,15 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     };
     this._isSelectingPivot = false;
     this._pivots = [];
+    this._hoverPivot = null;
   }
 
   pivotChanged(): Delegate<PivotChangeInfo> {
     return this._pivotChanged;
+  }
+
+  pivotSubCountClicked(): Delegate<SubCountInfo> {
+    return this._pivotSubCountClicked;
   }
 
   /**
@@ -70,7 +77,8 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
    */
   hitTest(x: number, y: number): PrimitiveHoveredItem | null {
     const elliottPane = this._paneViews[1];
-    if (elliottPane.isHover(x, y)) {
+    this._hoverPivot = elliottPane.isHover(x, y);
+    if (this._hoverPivot) {
       return {
         externalId: 'elliott-waves',
         cursorStyle: 'pointer',
@@ -88,7 +96,7 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   }
 
   updatePivots(pivots: WavePivot[]): void {
-    this._pivots = pivots;
+    this._pivots = [...pivots];
     this.requestUpdate();
   }
 
@@ -102,6 +110,14 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
         this._pivotChanged.fire(this._selectedPivot);
         this.requestUpdate();
       }
+
+      if (this._hoverPivot) {
+        const pivotTo = this.findNextPivot(this._hoverPivot);
+        this._pivotSubCountClicked.fire({
+          pivotFrom: this._hoverPivot,
+          pivotTo: pivotTo || undefined,
+        });
+      }
     }, this);
 
     this._mouseHandlers.mouseMoved().subscribe((mouseUpdate: MousePosition | null) => {
@@ -109,6 +125,25 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
       this._mousePosition = mouseUpdate;
       this.requestUpdate();
     }, this);
+  }
+
+  findNextPivot(p: WavePivot): WavePivot | null {
+    const nextWaveCount = p.wave + 1;
+    const index = this._pivots.findIndex((piv) => {
+      return piv.wave === p.wave && piv.degree === p.degree && piv.time === p.time;
+    });
+    if (index === -1) {
+      console.log('Could not find index =???????', this._pivots);
+      return null;
+    }
+    for (let i = index; i < this._pivots.length; i++) {
+      const p = this._pivots[i];
+      if (p.degree === p.degree && p.wave === nextWaveCount) {
+        return p;
+      }
+    }
+
+    return null;
   }
 
   detached(): void {

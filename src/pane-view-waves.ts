@@ -21,11 +21,20 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
     return 'top';
   }
 
-  isHover(x: number, y: number): boolean {
+  isHover(x: number, y: number): WavePivot | null {
     const pivot = this._pivots.find((p) => {
       return this._isHover(p, x, y);
     });
-    return !!pivot;
+    if (pivot) {
+      return {
+        wave: pivot.wave,
+        degree: pivot.degree,
+        type: pivot.type,
+        time: pivot.time,
+        price: pivot.price,
+      };
+    }
+    return null;
   }
 
   _isHover(p: UIPivot, x: number, y: number): boolean {
@@ -39,14 +48,19 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
   update() {
     const { chart, series, mousePosition } = this._source;
 
-    const mapUIPivot = (p: WavePivot) => {
+    const mapUIPivot = (p: WavePivot | UIPivot) => {
       const vPadding = p.type === PivotType.HIGH ? -20 : 20;
       const y = vPadding + (series.priceToCoordinate(p.price) as number);
       const x = chart.timeScale().timeToCoordinate(p.time) as number;
 
-      const newPivot = { ...p, x, y, isHover: false };
+      const newPivot = { ...p, x, y, isHover: false } as UIPivot;
       if (this._isHover(newPivot, mousePosition.x, mousePosition.y)) {
         newPivot.isHover = true;
+      }
+
+      if (newPivot.children && newPivot.children.length > 0) {
+        // Recursively map children
+        newPivot.children = newPivot.children.map(mapUIPivot);
       }
 
       return newPivot;

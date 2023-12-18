@@ -51,17 +51,24 @@ export type WavePivot = Pivot & {
   wave: Wave;
   degree: Degree;
   type: PivotType;
+  children?: WavePivot[];
 };
 
 export type UIPivot = WavePivot & {
   x: number;
   y: number;
   isHover: boolean;
+  children?: UIPivot[];
 };
 
 export interface PivotChangeInfo {
   time: Time;
   price: number;
+}
+
+export interface SubCountInfo {
+  pivotFrom: WavePivot;
+  pivotTo?: WavePivot;
 }
 
 export interface WaveNode {
@@ -75,5 +82,5 @@ export interface WaveNode {
 
 export interface ISeriesPrimitivePaneViewWithHover extends ISeriesPrimitivePaneView {
   [x: string]: any;
-  isHover(x: number, y: number): boolean;
+  isHover(x: number, y: number): WavePivot | null;
 }
