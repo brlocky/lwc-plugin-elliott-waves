@@ -127,18 +127,17 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     }, this);
   }
 
-  findNextPivot(p: WavePivot): WavePivot | null {
-    const nextWaveCount = p.wave + 1;
+  findNextPivot(pivot: WavePivot): WavePivot | null {
     const index = this._pivots.findIndex((piv) => {
-      return piv.wave === p.wave && piv.degree === p.degree && piv.time === p.time;
+      return piv.wave === pivot.wave && piv.degree === pivot.degree && piv.time === pivot.time;
     });
     if (index === -1) {
       console.log('Could not find index =???????', this._pivots);
       return null;
     }
-    for (let i = index; i < this._pivots.length; i++) {
+    for (let i = index + 1; i < this._pivots.length; i++) {
       const p = this._pivots[i];
-      if (p.degree === p.degree && p.wave === nextWaveCount) {
+      if (p.degree === p.degree && (p.wave === pivot.wave || p.wave === pivot.wave + 1)) {
         return p;
       }
     }
