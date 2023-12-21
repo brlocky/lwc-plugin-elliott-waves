@@ -22,19 +22,11 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
   }
 
   isHover(x: number, y: number): WavePivot | null {
-    const pivot = this._pivots.find((p) => {
-      return this._isHover(p, x, y);
-    });
-    if (pivot) {
-      return {
-        wave: pivot.wave,
-        degree: pivot.degree,
-        type: pivot.type,
-        time: pivot.time,
-        price: pivot.price,
-      };
-    }
-    return null;
+    return (
+      this._pivots.find((p) => {
+        return this._isHover(p, x, y);
+      }) || null
+    );
   }
 
   _isHover(p: UIPivot, x: number, y: number): boolean {
@@ -48,8 +40,19 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
   update() {
     const { chart, series, mousePosition } = this._source;
 
+    const getYGap = (pivot: WavePivot) => {
+      // Find pivots with the same time and price
+      const sameTimeAndPrice = this._source.pivots.filter(
+        (p) => p.time === pivot.time && pivot.price === p.price && p.degree < pivot.degree,
+      );
+
+      // Calculate the gap based on the index of the current pivot among those with the same time and price
+      return sameTimeAndPrice.length * 20;
+    };
+
     const mapUIPivot = (p: WavePivot | UIPivot) => {
-      const vPadding = p.type === PivotType.HIGH ? -20 : 20;
+      const gap = getYGap(p);
+      const vPadding = p.type === PivotType.HIGH ? -20 - gap : 20 + gap;
       const y = vPadding + (series.priceToCoordinate(p.price) as number);
       const x = chart.timeScale().timeToCoordinate(p.time) as number;
 
@@ -58,15 +61,10 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
         newPivot.isHover = true;
       }
 
-      if (newPivot.children && newPivot.children.length > 0) {
-        // Recursively map children
-        newPivot.children = newPivot.children.map(mapUIPivot);
-      }
-
       return newPivot;
     };
 
-    this._pivots = this._source.pivots.map(mapUIPivot);
+    this._pivots = this._source.pivots.map(mapUIPivot).filter((p) => p.visible);
 
     /* 
     const high = series.priceToCoordinate(barData.high) as Coordinate;

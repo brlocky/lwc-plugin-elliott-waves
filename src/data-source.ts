@@ -1,7 +1,7 @@
 import { IChartApi, ISeriesApi, SeriesOptionsMap } from 'lightweight-charts';
 import { ElliottWavesOptions } from './options';
 import { MousePosition } from './mouse';
-import { WavePivot } from './types';
+import { Interval, WavePivot } from './types';
 
 export interface ElliottWavesDataSource {
   chart: IChartApi;
@@ -10,4 +10,5 @@ export interface ElliottWavesDataSource {
   mousePosition: MousePosition;
   isSelectingPivot: boolean;
   pivots: WavePivot[];
+  interval: Interval;
 }

@@ -13,7 +13,7 @@ import { ElliottWavesPaneView } from './pane-view';
 import { PluginBase } from './plugin-base';
 import { MouseHandlers, MousePosition } from './mouse';
 import { Delegate } from './helpers/delegate';
-import { ISeriesPrimitivePaneViewWithHover, PivotChangeInfo, SubCountInfo, WavePivot } from './types';
+import { ISeriesPrimitivePaneViewWithHover, Interval, PivotChangeInfo, SubCountInfo, Wave, WavePivot } from './types';
 import { WavesPaneView } from './pane-view-waves';
 
 export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
@@ -27,6 +27,7 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   _pivotChanged: Delegate<PivotChangeInfo> = new Delegate();
   _pivotSubCountClicked: Delegate<SubCountInfo> = new Delegate();
   _hoverPivot: WavePivot | null;
+  _interval: Interval;
 
   constructor(options: Partial<ElliottWavesOptions> = {}) {
     super();
@@ -54,6 +55,7 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this._isSelectingPivot = false;
     this._pivots = [];
     this._hoverPivot = null;
+    this._interval = this._options.interval;
   }
 
   pivotChanged(): Delegate<PivotChangeInfo> {
@@ -95,8 +97,17 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     this.requestUpdate();
   }
 
+  updateInterval(interval: Interval): void {
+    this._interval = interval;
+    this.requestUpdate();
+  }
+
+  _flattenPivotsRecursive(pivot: WavePivot): WavePivot[] {
+    return [pivot, ...(pivot.children ? pivot.children.flatMap((p) => this._flattenPivotsRecursive(p)) : [])];
+  }
+
   updatePivots(pivots: WavePivot[]): void {
-    this._pivots = [...pivots];
+    this._pivots = pivots.flatMap((p) => this._flattenPivotsRecursive(p));
     this.requestUpdate();
   }
 
@@ -113,6 +124,8 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
 
       if (this._hoverPivot) {
         const pivotTo = this.findNextPivot(this._hoverPivot);
+        console.log('Pivot from ', this._hoverPivot);
+        console.log('Pivot to ', pivotTo);
         this._pivotSubCountClicked.fire({
           pivotFrom: this._hoverPivot,
           pivotTo: pivotTo || undefined,
@@ -127,17 +140,33 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
     }, this);
   }
 
+  isSamePivot(p1: WavePivot, p2: WavePivot) {
+    return p1.wave === p2.wave && p1.degree === p2.degree && p1.time === p2.time && p1.price === p2.price && p1.interval === p2.interval;
+  }
+
+  isNextPivot(p1: WavePivot, p2: WavePivot) {
+    if (p1.degree !== p2.degree) {
+      return false;
+    }
+
+    if (p1.interval !== p2.interval) {
+      return false;
+    }
+
+    return p1.wave === Wave._1 ? p1.wave === p2.wave || p1.wave + 1 === p2.wave : p1.wave + 1 === p2.wave;
+  }
+
   findNextPivot(pivot: WavePivot): WavePivot | null {
-    const index = this._pivots.findIndex((piv) => {
-      return piv.wave === pivot.wave && piv.degree === pivot.degree && piv.time === pivot.time;
-    });
-    if (index === -1) {
-      console.log('Could not find index =???????', this._pivots);
+    const startIndex = this._pivots.findIndex((p) => this.isSamePivot(p, pivot));
+    if (startIndex === -1) {
       return null;
     }
-    for (let i = index + 1; i < this._pivots.length; i++) {
+
+    for (let i = startIndex + 1; i < this._pivots.length; i++) {
       const p = this._pivots[i];
-      if (p.degree === p.degree && (p.wave === pivot.wave || p.wave === pivot.wave + 1)) {
+      console.log('p', pivot, p);
+
+      if (this.isNextPivot(pivot, p)) {
         return p;
       }
     }
@@ -197,6 +226,10 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
 
   public get pivots(): WavePivot[] {
     return this._pivots;
+  }
+
+  public get interval(): Interval {
+    return this._interval;
   }
 
   // We need to disable magnet mode for this to work nicely

@@ -47,11 +47,20 @@ export type Pivot = {
   price: number;
 };
 
+export type Interval = '1' | '5' | '10' | '30' | '60' | '240' | 'D' | 'W' | 'M';
+
 export type WavePivot = Pivot & {
   wave: Wave;
   degree: Degree;
   type: PivotType;
+  interval: Interval;
   children?: WavePivot[];
+  visible: boolean;
+  subTimes: {
+    month: Time | null;
+    week: Time | null;
+    day: Time | null;
+  };
 };
 
 export type UIPivot = WavePivot & {

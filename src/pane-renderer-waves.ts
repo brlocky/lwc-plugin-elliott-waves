@@ -2,7 +2,7 @@ import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-
 import { ISeriesPrimitivePaneRenderer } from 'lightweight-charts';
 import { positionsLine } from './helpers/dimensions/positions';
 import { averageWidthPerCharacter, centreLabelHeight, centreLabelInlinePadding } from './constants';
-import { PivotType, UIPivot } from './types';
+import { UIPivot } from './types';
 
 export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
   _pivots: UIPivot[];
@@ -26,36 +26,13 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     });
   }
 
-  _isHovered(pivot: UIPivot, crosshairX: number, crosshairY: number): boolean {
-    // Check if the crosshair is over the pivot
-    // Implement the logic based on your requirements
-    const vPadding = pivot.type === PivotType.HIGH ? -20 : 20;
-    const labelWidth = this._calculateLabelWidth((pivot.wave?.toString() || '').length);
-    const labelXDimensions = positionsLine(pivot.x as number, 1, labelWidth);
-    const yDimensions = positionsLine(pivot.y + vPadding, 1, centreLabelHeight);
-
-    return (
-      crosshairX >= labelXDimensions.position &&
-      crosshairX <= labelXDimensions.position + labelXDimensions.length &&
-      crosshairY >= yDimensions.position &&
-      crosshairY <= yDimensions.position + yDimensions.length
-    );
-  }
-
   _calculateLabelWidth(textLength: number) {
     return centreLabelInlinePadding * 2 + 2 * textLength * averageWidthPerCharacter;
   }
 
   _drawPivots(scope: BitmapCoordinatesRenderingScope, pivots: UIPivot[]) {
-    if (!pivots.length) return;
-
     pivots.forEach((p) => {
       this._drawPivot(scope, p);
-
-      if (p.children && p.children.length > 0) {
-        // Recursively draw children
-        this._drawPivots(scope, p.children);
-      }
     });
   }
 
