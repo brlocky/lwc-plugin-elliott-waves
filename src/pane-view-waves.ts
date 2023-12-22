@@ -37,22 +37,27 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
     return false;
   }
 
+  groupPivotsByTimeAndPrice(pivots: WavePivot[]): WavePivot[][] {
+    const groupedPivots: { [key: string]: WavePivot[] } = {};
+
+    pivots.forEach((pivot) => {
+      const key = `${pivot.time}_${pivot.price}`;
+
+      if (!groupedPivots[key]) {
+        groupedPivots[key] = [];
+      }
+
+      groupedPivots[key].push(pivot);
+    });
+
+    return Object.values(groupedPivots);
+  }
+
   update() {
     const { chart, series, mousePosition } = this._source;
-
-    const getYGap = (pivot: WavePivot) => {
-      // Find pivots with the same time and price
-      const sameTimeAndPrice = this._source.pivots.filter(
-        (p) => p.time === pivot.time && pivot.price === p.price && p.degree < pivot.degree,
-      );
-
-      // Calculate the gap based on the index of the current pivot among those with the same time and price
-      return sameTimeAndPrice.length * 20;
-    };
-
-    const mapUIPivot = (p: WavePivot | UIPivot) => {
-      const gap = getYGap(p);
-      const vPadding = p.type === PivotType.HIGH ? -20 - gap : 20 + gap;
+    const mapUIPivot = (p: WavePivot, gapIndex: number): UIPivot => {
+      const gapPadding = gapIndex * 22;
+      const vPadding = p.type === PivotType.HIGH ? -20 - gapPadding : 20 + gapPadding;
       const y = vPadding + (series.priceToCoordinate(p.price) as number);
       const x = chart.timeScale().timeToCoordinate(p.time) as number;
 
@@ -64,8 +69,19 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
       return newPivot;
     };
 
-    this._pivots = this._source.pivots.map(mapUIPivot).filter((p) => p.visible);
+    const priceTimeMappedPivots = this.groupPivotsByTimeAndPrice(this._source.pivots);
+    const mappedPivots: UIPivot[] = [];
+    priceTimeMappedPivots.forEach((pivots) => {
+      const filteredSortedMapped = pivots
+        .filter((p) => p.visible)
+        .sort((a, b) => a.degree - b.degree)
+        .map((p, i) => {
+          return mapUIPivot(p, i);
+        });
+      mappedPivots.push(...filteredSortedMapped);
+    });
 
+    this._pivots = mappedPivots;
     /* 
     const high = series.priceToCoordinate(barData.high) as Coordinate;
     const low = series.priceToCoordinate(barData.low) as Coordinate;

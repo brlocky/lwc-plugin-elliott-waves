@@ -124,8 +124,6 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
 
       if (this._hoverPivot) {
         const pivotTo = this.findNextPivot(this._hoverPivot);
-        console.log('Pivot from ', this._hoverPivot);
-        console.log('Pivot to ', pivotTo);
         this._pivotSubCountClicked.fire({
           pivotFrom: this._hoverPivot,
           pivotTo: pivotTo || undefined,
@@ -164,7 +162,6 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
 
     for (let i = startIndex + 1; i < this._pivots.length; i++) {
       const p = this._pivots[i];
-      console.log('p', pivot, p);
 
       if (this.isNextPivot(pivot, p)) {
         return p;
@@ -190,12 +187,6 @@ export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   paneViews() {
     //* rendering on the main chart pane
     return this._paneViews;
-  }
-
-  dataUpdated(scope: DataChangedScope): void {
-    console.log('Update ', scope);
-    //* This method will be called by PluginBase when the data on the
-    //* series has changed.
   }
 
   _timeCurrentlyVisible(time: Time, startTimePoint: Logical, endTimePoint: Logical): boolean {
