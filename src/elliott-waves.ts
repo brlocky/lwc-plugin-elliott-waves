@@ -1,12 +1,4 @@
-import {
-  Logical,
-  Time,
-  DataChangedScope,
-  SeriesAttachedParameter,
-  CrosshairMode,
-  Coordinate,
-  PrimitiveHoveredItem,
-} from 'lightweight-charts';
+import { Logical, Time, SeriesAttachedParameter, CrosshairMode, Coordinate, PrimitiveHoveredItem } from 'lightweight-charts';
 import { ElliottWavesDataSource } from './data-source';
 import { ElliottWavesOptions, defaultOptions } from './options';
 import { ElliottWavesPaneView } from './pane-view';
