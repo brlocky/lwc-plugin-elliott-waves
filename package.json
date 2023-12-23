@@ -1,9 +1,11 @@
 {
-  "name": "@brlocky/lwc-plugin-elliott-waves",
-  "version": "1.0.13",
+  "name": "lwc-plugin-elliott-waves",
+  "version": "1.0.15",
   "type": "module",
-  "main": "src/index.ts",
-  "types": "types/index.ts",
+  "module": "dist/lwc-plugin-elliott-waves.d.cts",
+  "main": "dist/lwc-plugin-elliott-waves.js",
+  "types": "dist/lwc-plugin-elliott-waves.d.ts",
+  "style": "dist/style.css",
   "scripts": {
     "dev": "vite --config src/vite.config.js",
     "compile": "tsc && node compile.mjs"
