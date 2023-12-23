@@ -20,9 +20,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: env
-    defaults:
-      run:
-        working-directory: ./dist
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -30,7 +27,10 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
       - run: npm ci
+      - run: npm run compile
       - run: grunt bump
-      - run: npm publish
+      - name: Publish
+        working-directory: ./build
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
