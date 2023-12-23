@@ -3,20 +3,21 @@ import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { build, defineConfig } from 'vite';
 import { fileURLToPath } from 'url';
 import { generateDtsBundle } from 'dts-bundle-generator';
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 
-function buildPackageJson(packageName) {
+function buildPackageJson(packageName, version) {
   /*
 	 Define the contents of the package's package.json here.
 	 */
   return {
     name: packageName,
-    version: '1.0.0',
+    version: version,
     keywords: ['lwc-plugin', 'lightweight-charts'],
     type: 'module',
     main: `./${packageName}.umd.cjs`,
     module: `./${packageName}.js`,
     types: `./${packageName}.d.ts`,
+    style: 'styles.css', // Add this line to include your CSS file
     exports: {
       import: {
         types: `./${packageName}.d.ts`,
@@ -84,7 +85,10 @@ await Promise.all(promises);
 console.log('Generating the package.json file...');
 pluginsToBuild.forEach((file) => {
   const packagePath = resolve(compiledFolder, 'package.json');
-  const content = JSON.stringify(buildPackageJson(file.exportName), undefined, 4);
+  const package2Path = resolve(currentDir, 'package.json');
+  const existingPackageJson = JSON.parse(readFileSync(package2Path, 'utf-8'));
+  const existingVersion = existingPackageJson.version;
+  const content = JSON.stringify(buildPackageJson(file.exportName, existingVersion), undefined, 4);
   writeFileSync(packagePath, content, { encoding: 'utf-8' });
 });
 console.log('Generating the typings files...');
@@ -122,21 +126,6 @@ if (existsSync(sourceFontsFolder)) {
     copyFileSync(sourceFontPath, targetFontPath);
   });
 }
-
-// Step 3: Generate package.json
-console.log('Generating the package.json file...');
-pluginsToBuild.forEach((file) => {
-  const packagePath = resolve(compiledFolder, 'package.json');
-  const content = JSON.stringify(
-    {
-      ...buildPackageJson(file.exportName),
-      style: 'styles.css', // Add this line to include your CSS file
-    },
-    undefined,
-    4,
-  );
-  writeFileSync(packagePath, content, { encoding: 'utf-8' });
-});
 
 const endTime = Date.now().valueOf();
 console.log(`🎉 Done (${endTime - startTime}ms)`);
