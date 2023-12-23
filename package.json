@@ -18,7 +18,7 @@
     "lightweight-charts": "^4.1.0-rc2"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@brlocky"
+    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
