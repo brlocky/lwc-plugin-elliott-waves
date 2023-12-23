@@ -1,6 +1,6 @@
 {
   "name": "lwc-plugin-elliott-waves",
-  "version": "1.0.15",
+  "version": "1.0.1",
   "type": "module",
   "module": "dist/lwc-plugin-elliott-waves.d.cts",
   "main": "dist/lwc-plugin-elliott-waves.js",
