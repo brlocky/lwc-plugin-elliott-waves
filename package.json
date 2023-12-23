@@ -17,9 +17,6 @@
     "fancy-canvas": "^2.1.0",
     "lightweight-charts": "^4.1.0-rc2"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "repository": {
     "type": "git",
     "url": "git@github.com:brlocky/lwc-plugin-elliott-waves.git"
