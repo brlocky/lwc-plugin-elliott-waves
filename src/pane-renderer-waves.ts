@@ -142,8 +142,6 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     ctx.textAlign = 'center';
     const fontSize = this._getDegreeFontSize(pivot);
     ctx.font = `${Math.round(fontSize * scope.verticalPixelRatio)}px EW-${pivot.degree}`;
-    console.log(`EW-${pivot.degree}`, pivot.price);
-
     ctx.fillText(text, labelXDimensions.position, pivot.y * scope.verticalPixelRatio);
   }
 }

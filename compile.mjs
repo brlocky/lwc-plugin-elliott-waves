@@ -91,6 +91,7 @@ pluginsToBuild.forEach((file) => {
   const content = JSON.stringify(buildPackageJson(file.exportName, existingVersion), undefined, 4);
   writeFileSync(packagePath, content, { encoding: 'utf-8' });
 });
+
 console.log('Generating the typings files...');
 pluginsToBuild.forEach((file) => {
   try {
@@ -108,24 +109,6 @@ pluginsToBuild.forEach((file) => {
     console.error('Error generating typings for: ', file.exportName);
   }
 });
-
-const sourceFontsFolder = resolve(currentDir, 'fonts');
-const targetFontsFolder = resolve(compiledFolder, 'fonts');
-
-if (existsSync(sourceFontsFolder)) {
-  // Create 'fonts' directory in the dist folder if it doesn't exist
-  if (!existsSync(targetFontsFolder)) {
-    mkdirSync(targetFontsFolder);
-  }
-
-  // Copy fonts
-  const fontFiles = readdirSync(sourceFontsFolder);
-  fontFiles.forEach((fontFile) => {
-    const sourceFontPath = resolve(sourceFontsFolder, fontFile);
-    const targetFontPath = resolve(targetFontsFolder, fontFile);
-    copyFileSync(sourceFontPath, targetFontPath);
-  });
-}
 
 const endTime = Date.now().valueOf();
 console.log(`🎉 Done (${endTime - startTime}ms)`);
