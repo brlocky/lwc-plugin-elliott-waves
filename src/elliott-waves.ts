@@ -7,6 +7,7 @@ import { MouseHandlers, MousePosition } from './mouse';
 import { Delegate } from './helpers/delegate';
 import { ISeriesPrimitivePaneViewWithHover, Interval, PivotChangeInfo, SubCountInfo, Wave, WavePivot } from './types';
 import { WavesPaneView } from './pane-view-waves';
+import '../style.css';
 
 export class ElliottWaves extends PluginBase implements ElliottWavesDataSource {
   _options: ElliottWavesOptions;

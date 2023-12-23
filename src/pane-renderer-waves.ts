@@ -1,8 +1,7 @@
 import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
 import { ISeriesPrimitivePaneRenderer } from 'lightweight-charts';
 import { positionsLine } from './helpers/dimensions/positions';
-import { averageWidthPerCharacter, centreLabelHeight, centreLabelInlinePadding } from './constants';
-import { UIPivot, Wave } from './types';
+import { Degree, UIPivot, Wave } from './types';
 
 export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
   _pivots: UIPivot[];
@@ -24,10 +23,6 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
         }
       }); */
     });
-  }
-
-  _calculateLabelWidth(textLength: number) {
-    return centreLabelInlinePadding * 2 + 2 * textLength * averageWidthPerCharacter;
   }
 
   _drawPivots(scope: BitmapCoordinatesRenderingScope, pivots: UIPivot[]) {
@@ -53,49 +48,102 @@ export class WavesPaneRenderer implements ISeriesPrimitivePaneRenderer {
     return pivot.wave?.toString() || ('- ' as string);
   }
 
+  _getDegreeColor(pivot: UIPivot) {
+    switch (pivot.degree) {
+      case Degree.SUPERMILLENNIUM:
+        return 'red';
+      case Degree.MILLENNIUM:
+        return '#FF7900';
+      case Degree.SUBMILLENNIUM:
+        return 'blue';
+      case Degree.GRANDSUPERCYCLE:
+        return 'darkblue';
+      case Degree.SUPERCYCLE:
+        return 'olive';
+      case Degree.CYCLE:
+        return 'teal';
+      case Degree.PRIMARY:
+        return 'maroon';
+      case Degree.INTERMEDIATE:
+        return 'black';
+      case Degree.MINOR:
+        return 'blue';
+      case Degree.MINUTE:
+        return 'pink';
+      case Degree.MINUETTE:
+        return 'green';
+      case Degree.SUBMINUETTE:
+        return 'orange';
+      case Degree.MICRO:
+        return 'purple';
+      case Degree.SUBMICRO:
+        return 'aqua';
+      case Degree.MINISCULE:
+        return 'red';
+    }
+
+    return 'red';
+  }
+
+  _getDegreeFontSize(pivot: UIPivot) {
+    switch (pivot.degree) {
+      case Degree.SUPERMILLENNIUM:
+        return 22;
+      case Degree.MILLENNIUM:
+        return 21;
+      case Degree.SUBMILLENNIUM:
+        return 20;
+      case Degree.GRANDSUPERCYCLE:
+        return 19;
+      case Degree.SUPERCYCLE:
+        return 18;
+      case Degree.CYCLE:
+        return 17;
+      case Degree.PRIMARY:
+        return 17;
+      case Degree.INTERMEDIATE:
+        return 16;
+      case Degree.MINOR:
+        return 15;
+      case Degree.MINUTE:
+        return 14;
+      case Degree.MINUETTE:
+        return 13;
+      case Degree.SUBMINUETTE:
+        return 12;
+      case Degree.MICRO:
+        return 11;
+      case Degree.SUBMICRO:
+        return 11;
+      case Degree.MINISCULE:
+        return 11;
+    }
+
+    return 99;
+  }
+
   _drawPivot(scope: BitmapCoordinatesRenderingScope, pivot: UIPivot) {
     const ctx = scope.context;
     let text = this._getPivotText(pivot);
 
-    const labelWidth = this._calculateLabelWidth(text.length);
-    const labelXDimensions = positionsLine(pivot.x as number, scope.horizontalPixelRatio, labelWidth);
-    const yDimensions = positionsLine(pivot.y, scope.verticalPixelRatio, centreLabelHeight);
+    const labelXDimensions = positionsLine(pivot.x as number, scope.horizontalPixelRatio, 0);
+    const yDimensions = positionsLine(pivot.y, scope.verticalPixelRatio, 0);
 
-    const radius = 4 * scope.horizontalPixelRatio;
-
-    // draw main body background of label
     ctx.beginPath();
-    ctx.roundRect(labelXDimensions.position, yDimensions.position, labelXDimensions.length, yDimensions.length, radius);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fill();
 
     if (pivot.isHover) {
-      // draw hover background for remove button
-      //ctx.beginPath();
-      ctx.roundRect(labelXDimensions.position, yDimensions.position, labelXDimensions.length, yDimensions.length, [0, radius, radius, 0]);
-      //ctx.fillStyle = '#F0F3FA';
-      ctx.fillStyle = '#FF0000';
+      ctx.roundRect(labelXDimensions.position, yDimensions.position, yDimensions.length, yDimensions.length, 10);
+      ctx.fillStyle = '#FF0F00';
       ctx.fill();
     }
 
-    // draw stroke for main body
-    //ctx.beginPath();
-    ctx.roundRect(labelXDimensions.position, yDimensions.position, labelXDimensions.length, yDimensions.length, radius);
-    ctx.strokeStyle = '#131722';
-    ctx.lineWidth = 1 * scope.horizontalPixelRatio;
-    ctx.stroke();
-
-    // write text
-    //ctx.beginPath();
-    ctx.fillStyle = '#131722';
+    ctx.fillStyle = this._getDegreeColor(pivot);
     ctx.textBaseline = 'middle';
-    // ctx.font = `${Math.round(12 * scope.verticalPixelRatio)}px EW`;
-    ctx.font = `${Math.round(16 * scope.verticalPixelRatio)}px arial`;
+    ctx.textAlign = 'center';
+    const fontSize = this._getDegreeFontSize(pivot);
+    ctx.font = `${Math.round(fontSize * scope.verticalPixelRatio)}px EW-${pivot.degree}`;
+    console.log(`EW-${pivot.degree}`, pivot.price);
 
-    ctx.fillText(
-      text,
-      labelXDimensions.position + centreLabelInlinePadding * scope.horizontalPixelRatio,
-      pivot.y * scope.verticalPixelRatio,
-    );
+    ctx.fillText(text, labelXDimensions.position, pivot.y * scope.verticalPixelRatio);
   }
 }

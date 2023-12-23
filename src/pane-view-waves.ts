@@ -56,7 +56,7 @@ export class WavesPaneView implements ISeriesPrimitivePaneViewWithHover {
   update() {
     const { chart, series, mousePosition } = this._source;
     const mapUIPivot = (p: WavePivot, gapIndex: number): UIPivot => {
-      const gapPadding = gapIndex * 22;
+      const gapPadding = gapIndex * 30;
       const vPadding = p.type === PivotType.HIGH ? -20 - gapPadding : 20 + gapPadding;
       const y = vPadding + (series.priceToCoordinate(p.price) as number);
       const x = chart.timeScale().timeToCoordinate(p.time) as number;

@@ -1,0 +1,74 @@
+@font-face {
+  font-family: 'EW-15';
+  src: url('./fonts/Trading-Supermillennium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-14';
+  src: url('./fonts/Trading-Millennium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-13';
+  src: url('./fonts/Trading-Submillennium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-12';
+  src: url('./fonts/Trading-GrandSupercycle.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-11';
+  src: url('./fonts/Trading-Supercycle.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-10';
+  src: url('./fonts/Trading-Cycle.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-9';
+  src: url('./fonts/Trading-Primary.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-8';
+  src: url('./fonts/Trading-Intermediate.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-7';
+  src: url('./fonts/Trading-Minor.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-6';
+  src: url('./fonts/Trading-Minute.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-5';
+  src: url('./fonts/Trading-Minuette.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-4';
+  src: url('./fonts/Trading-Subminuette.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-3';
+  src: url('./fonts/Trading-Micro.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-2';
+  src: url('./fonts/Trading-Submicro.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'EW-1';
+  src: url('./fonts/Trading-Miniscule.ttf') format('truetype');
+}
