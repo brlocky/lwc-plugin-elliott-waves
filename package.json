@@ -1,6 +1,6 @@
 {
   "name": "lwc-plugin-elliott-waves",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "type": "module",
   "main": "dist/lwc-plugin-elliott-waves.js",
   "types": "dist/lwc-plugin-elliott-waves.d.ts",
@@ -16,7 +16,6 @@
   "dependencies": {
     "dts-bundle-generator": "^8.0.1",
     "fancy-canvas": "^2.1.0",
-    "grunt-bump": "^0.8.0",
     "lightweight-charts": "^4.1.0-rc2"
   },
   "repository": {
