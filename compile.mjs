@@ -19,13 +19,25 @@ function buildPackageJson(packageName, version) {
     types: `./${packageName}.d.ts`,
     style: 'style.css', // Add this line to include your CSS file
     exports: {
-      import: {
-        types: `./${packageName}.d.ts`,
-        default: `./${packageName}.js`,
+      '.': {
+        import: {
+          types: `./${packageName}.d.ts`,
+          default: `./${packageName}.js`,
+        },
+        require: {
+          types: `./${packageName}.d.cts`,
+          default: `./${packageName}.umd.cjs`,
+        },
       },
-      require: {
-        types: `./${packageName}.d.cts`,
-        default: `./${packageName}.umd.cjs`,
+      './style.css': {
+        import: {
+          types: './style.css',
+          default: './style.css',
+        },
+        require: {
+          types: './style.css',
+          default: './style.css',
+        },
       },
     },
   };
