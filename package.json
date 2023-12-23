@@ -1,6 +1,6 @@
 {
-  "name": "lwc-plugin-elliott-waves",
-  "version": "1.0.12",
+  "name": "@brlocky/lwc-plugin-elliott-waves",
+  "version": "1.0.13",
   "type": "module",
   "main": "src/index.ts",
   "types": "types/index.ts",
@@ -18,7 +18,7 @@
     "lightweight-charts": "^4.1.0-rc2"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com/@brlocky"
   },
   "repository": {
     "type": "git",
